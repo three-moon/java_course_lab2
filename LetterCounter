@@ -1,0 +1,125 @@
+import java.io.*;
+
+public class LetterCounter {
+    private final int bufferLength;
+    private int[] resultArray;
+
+    public LetterCounter(int bufferLength) {
+        this.bufferLength = bufferLength;
+    }
+
+    public void run() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String inputPath = null;
+        String outputPath = null;
+        try {
+            System.out.print("Input file: ");
+            inputPath = reader.readLine();
+            System.out.print("Output file: ");
+            outputPath = reader.readLine();
+            reader.close();
+        } catch (IOException e) {
+            System.out.println("Input/Output error has occurred");
+        }
+        controller(inputPath, outputPath);
+    }
+
+    public void run(String inputPath, String outputPath) {
+        controller(inputPath, outputPath);
+    }
+
+    private void controller(String inputPath, String outputPath) {
+        if (inputPath == null || inputPath.isBlank() || outputPath == null || outputPath.isBlank()) {
+            System.out.println("Empty input!");
+        } else {
+            if (processFiles(inputPath, outputPath) == 0) {
+                System.out.println("Successful!");
+            } else {
+                System.out.println("Error has occurred");
+            }
+
+        }
+    }
+
+    private int processFiles(String inputPath, String outputPath) {
+        File inputFile = new File(inputPath);
+        File outputFile = new File(outputPath);
+
+        BufferedReader fileReader;
+        BufferedWriter fileWriter;
+        try {
+            fileReader = new BufferedReader(new FileReader(inputFile));
+        } catch (FileNotFoundException e) {
+            System.out.println("Input file not found");
+            return 1;
+        }
+        try {
+            fileWriter = new BufferedWriter(new FileWriter(outputFile));
+        } catch (IOException e) {
+            System.out.println("Output file writing error");
+            return 1;
+        }
+        resultArray = new int['z' - 'a' + 1 + 'Z' - 'A' + 1];
+        for (int i = 0; i < 'z' - 'a' + 1 + 'Z' - 'A' + 1; ++i) {
+            resultArray[i] = 0;
+        }
+        try {
+            processBufferedReader(fileReader);
+        } catch (IOException e) {
+            System.out.println("Read error has occurred");
+            return 1;
+        }
+        try {
+            processBufferedWriter(fileWriter);
+        } catch (IOException e) {
+            System.out.println("Write error has occurred");
+            return 1;
+        }
+        try {
+            fileReader.close();
+            fileWriter.close();
+        } catch (IOException e) {
+            System.out.println("Reader/writer error has occurred");
+            return 1;
+        }
+        return 0;
+    }
+
+    private void processBufferedReader(BufferedReader bufferedReader) throws IOException {
+        char[] buffer = new char[bufferLength];
+        int len = bufferedReader.read(buffer, 0, bufferLength);
+        while (len != -1) {
+            for (int j = 0; j < len; ++j) {
+                int index = getCharArrayIndex(buffer[j]);
+                if (index >= 0) {
+                    ++resultArray[index];
+                }
+            }
+            len = bufferedReader.read(buffer, 0, bufferLength);
+        }
+    }
+
+    private void processBufferedWriter(BufferedWriter bufferedWriter) throws IOException {
+        for (int i = 0; i < 'z' - 'a' + 1 + 'Z' - 'A' + 1; ++i) {
+            bufferedWriter.write(getArrayIndexChar(i) + ": " + resultArray[i] + '\n');
+        }
+    }
+
+    private int getCharArrayIndex(char letter) {
+        if ('a' <= letter && letter <= 'z') {
+            return letter - 'a';
+        } else if ('A' <= letter && letter <= 'Z') {
+            return 'z' - 'a' + 1 + letter - 'A';
+        } else {
+            return -1;
+        }
+    }
+
+    private char getArrayIndexChar(int index) {
+        if (index <= 'z' - 'a') {
+            return (char) ('a' + index);
+        } else {
+            return (char) ('A' + index - ('z' - 'a' + 1));
+        }
+    }
+}
