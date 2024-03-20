@@ -1,0 +1,8 @@
+public class Main {
+    public static void main(String[] args) {
+        LetterCounter letterCounter = new LetterCounter(4096);
+        // letterCounter.run(inputPath, outputPath) - Без использования стандартного ввода
+        // letterCounter.run() - С использованием стандартного ввода
+        letterCounter.run();
+    }
+}
